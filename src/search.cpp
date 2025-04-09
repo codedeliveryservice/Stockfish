@@ -286,25 +286,6 @@ void Search::Worker::iterative_deepening() {
     double timeReduction = 1, totBestMoveChanges = 0;
     int    delta, iterIdx                        = 0;
 
-    // Allocate stack with extra size to allow access from (ss - 7) to (ss + 2):
-    // (ss - 7) is needed for update_continuation_histories(ss - 1) which accesses (ss - 6),
-    // (ss + 2) is needed for initialization of cutOffCnt.
-    Stack  stack[MAX_PLY + 10] = {};
-    Stack* ss                  = stack + 7;
-
-    for (int i = 7; i > 0; --i)
-    {
-        (ss - i)->continuationHistory =
-          &this->continuationHistory[0][0][NO_PIECE][0];  // Use as a sentinel
-        (ss - i)->continuationCorrectionHistory = &this->continuationCorrectionHistory[NO_PIECE][0];
-        (ss - i)->staticEval                    = VALUE_NONE;
-    }
-
-    for (int i = 0; i <= MAX_PLY + 2; ++i)
-        (ss + i)->ply = i;
-
-    ss->pv = pv;
-
     if (mainThread)
     {
         if (mainThread->bestPreviousScore == VALUE_INFINITE)
@@ -376,6 +357,25 @@ void Search::Worker::iterative_deepening() {
             int failedHighCnt = 0;
             while (true)
             {
+                // Allocate stack with extra size to allow access from (ss - 7) to (ss + 2):
+                // (ss - 7) is needed for update_continuation_histories(ss - 1) which accesses (ss - 6),
+                // (ss + 2) is needed for initialization of cutOffCnt.
+                Stack  stack[MAX_PLY + 10] = {};
+                Stack* ss                  = stack + 7;
+
+                for (int i = 7; i > 0; --i)
+                {
+                    (ss - i)->continuationHistory =
+                      &this->continuationHistory[0][0][NO_PIECE][0];  // Use as a sentinel
+                    (ss - i)->continuationCorrectionHistory = &this->continuationCorrectionHistory[NO_PIECE][0];
+                    (ss - i)->staticEval                    = VALUE_NONE;
+                }
+
+                for (int i = 0; i <= MAX_PLY + 2; ++i)
+                    (ss + i)->ply = i;
+
+                ss->pv = pv;
+
                 // Adjust the effective depth searched, but ensure at least one
                 // effective increment for every four searchAgain steps (see issue #2717).
                 Depth adjustedDepth =
