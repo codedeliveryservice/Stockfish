@@ -884,6 +884,9 @@ endif
 ### Section 4. Public Targets
 ### ==========================================================================
 
+build: config-sanity
+	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) all
+
 help:
 	@echo "" && \
 	echo "To compile stockfish, type: " && \
@@ -970,9 +973,6 @@ endif
 
 analyze: net config-sanity objclean
 	$(MAKE) -k ARCH=$(ARCH) COMP=$(COMP) $(OBJS)
-
-build: net config-sanity
-	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) all
 
 profile-build: net config-sanity objclean profileclean
 	@echo ""
