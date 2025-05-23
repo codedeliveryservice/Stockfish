@@ -759,6 +759,8 @@ endif
 ### Section 4. Public Targets
 ### ==========================================================================
 
+build: config-sanity
+	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) all
 
 help:
 	@echo ""
@@ -839,9 +841,6 @@ endif
 	icx-profile-use icx-profile-make \
 	gcc-profile-use gcc-profile-make \
 	clang-profile-use clang-profile-make FORCE
-
-build: net config-sanity
-	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) all
 
 profile-build: net config-sanity objclean profileclean
 	@echo ""
