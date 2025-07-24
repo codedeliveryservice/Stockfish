@@ -389,6 +389,9 @@ void Search::Worker::iterative_deepening() {
                 break;
         }
 
+        if (limits.nodes && threads.nodes_searched() >= limits.nodes)
+            threads.stop = threads.abortedSearch = true;
+
         if (!threads.stop)
             completedDepth = rootDepth;
 
@@ -1918,8 +1921,7 @@ void SearchManager::check_time(Search::Worker& worker) {
     if (--callsCnt > 0)
         return;
 
-    // When using nodes, ensure checking rate is not lower than 0.1% of nodes
-    callsCnt = worker.limits.nodes ? std::min(512, int(worker.limits.nodes / 1024)) : 512;
+    callsCnt = 512;
 
     static TimePoint lastInfoTime = now();
 
@@ -1941,8 +1943,7 @@ void SearchManager::check_time(Search::Worker& worker) {
       // root-search score and PV in a multithreaded environment to prove mated-in scores.
       worker.completedDepth >= 1
       && ((worker.limits.use_time_management() && (elapsed > tm.maximum() || stopOnPonderhit))
-          || (worker.limits.movetime && elapsed >= worker.limits.movetime)
-          || (worker.limits.nodes && worker.threads.nodes_searched() >= worker.limits.nodes)))
+          || (worker.limits.movetime && elapsed >= worker.limits.movetime)))
         worker.threads.stop = worker.threads.abortedSearch = true;
 }
 
